@@ -8,6 +8,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.util.List;
+import java.util.Objects;
+
 @Repository
 public class RoleDaoImpl implements RoleDao{
 
@@ -15,7 +17,13 @@ public class RoleDaoImpl implements RoleDao{
     private EntityManager entityManager;
     @Override
     public void add(Role role) {
-        entityManager.persist(role);
+        if (Objects.isNull(role.getId())) {
+            entityManager.persist(role);
+        } else {
+            if (!Objects.isNull(show(role.getId()))) {
+                entityManager.merge(role);
+            }
+        }
     }
 
     @Override

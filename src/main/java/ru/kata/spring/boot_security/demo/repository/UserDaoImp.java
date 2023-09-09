@@ -8,6 +8,7 @@ import ru.kata.spring.boot_security.demo.model.User;
 
 
 import java.util.List;
+import java.util.Objects;
 
 
 @Repository
@@ -17,43 +18,40 @@ public class UserDaoImp implements UserDao {
 
     @Override
     public void add(User user) {
-        entityManager.persist(user);
-    }
-    @Override
-    public User show(Long id) {
-        User user = entityManager.find(User.class, id);
-        entityManager.detach(user);
-        return user;
+
+        if (Objects.isNull(user.getId())) {
+            entityManager.persist(user);
+        } else {
+            if (!Objects.isNull(show(user.getId()))) {
+                entityManager.merge(user);
+            }
+        }
     }
 
     @Override
-    public void update(Long id, User user) {
-        User userToBeUpdated = entityManager.find(User.class, id);
-        userToBeUpdated.setFirstName(user.getFirstName());
-        userToBeUpdated.setLastName(user.getLastName());
-        userToBeUpdated.setPassword(user.getPassword());
-        userToBeUpdated.setRoles(user.getRoles());
-        entityManager.merge(userToBeUpdated);
+    public User show(Long id) {
+        return entityManager.createQuery("SELECT u FROM User u LEFT JOIN FETCH u.roles WHERE u.id = :id", User.class)
+                .setParameter("id", id)
+                .getSingleResult();
     }
 
     @Override
     public void delete(Long id) {
-        User userToBeDeleted = entityManager.find(User.class, id);
-        entityManager.remove(userToBeDeleted);
+        entityManager.createQuery("DELETE FROM User WHERE id = :id")
+                .setParameter("id", id)
+                .executeUpdate();
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<User> findAll() {
-        Query query = entityManager.createQuery("FROM User");
+        Query query = entityManager.createQuery("SELECT DISTINCT u FROM User u LEFT JOIN FETCH u.roles", User.class);
         return query.getResultList();
     }
     @Override
-    //  @Query("Select u from User u left join fetch u.roles where u.username=:username")
      public User findByUsername(String username) {
-        Query query = entityManager.createQuery("SELECT u FROM User u LEFT JOIN u.roles WHERE u.username=:username");
+        Query query = entityManager.createQuery("SELECT u FROM User u LEFT JOIN FETCH u.roles WHERE u.username=:username", User.class);
         query.setParameter("username",username);
-
         return (User) query.getSingleResult();
     }
 }

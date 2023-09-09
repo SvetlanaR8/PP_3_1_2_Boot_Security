@@ -19,12 +19,10 @@ import java.util.List;
 
 public class UsersController {
     private final UserService userService;
-    private final RoleService roleService;
 
     @Autowired
     public UsersController(UserService userService, RoleService roleService) {
         this.userService = userService;
-        this.roleService = roleService;
     }
 
 
