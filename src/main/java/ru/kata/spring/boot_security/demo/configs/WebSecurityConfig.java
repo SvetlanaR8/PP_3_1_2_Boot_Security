@@ -1,20 +1,24 @@
 package ru.kata.spring.boot_security.demo.configs;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import ru.kata.spring.boot_security.demo.service.UsersDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import ru.kata.spring.boot_security.demo.service.UsersDetailsServiceImpl;
 
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final SuccessUserHandler successUserHandler;
-    private final UsersDetailsService usersDetailsService;
+    private final UsersDetailsServiceImpl usersDetailsService;
     @Autowired
-    public WebSecurityConfig(SuccessUserHandler successUserHandler, UsersDetailsService usersDetailsService) {
+    public WebSecurityConfig(SuccessUserHandler successUserHandler, UsersDetailsServiceImpl usersDetailsService) {
         this.successUserHandler = successUserHandler;
         this.usersDetailsService = usersDetailsService;
     }
@@ -38,13 +42,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     protected void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
-        authenticationManagerBuilder.userDetailsService(usersDetailsService);
+        authenticationManagerBuilder.userDetailsService(usersDetailsService)
+                .passwordEncoder(getPasswordEncoder());
     }
 
-//    @Bean
-//    public PasswordEncoder getPasswordEncoder() {
-//        return NoOpPasswordEncoder.getInstance();
-//    }
+    @Bean
+    public PasswordEncoder getPasswordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
     // аутентификация inMemory
 //    @Bean

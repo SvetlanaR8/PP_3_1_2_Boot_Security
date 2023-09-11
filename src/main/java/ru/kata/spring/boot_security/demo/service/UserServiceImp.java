@@ -1,6 +1,7 @@
 package ru.kata.spring.boot_security.demo.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.kata.spring.boot_security.demo.model.Role;
@@ -16,15 +17,18 @@ public class UserServiceImp implements UserService {
 
     private final UserDao userDao;
     private final RoleService roleService;
+    private final PasswordEncoder passwordEncoder;
     @Autowired
-    public UserServiceImp(UserDao userDao, RoleService roleService) {
+    public UserServiceImp(UserDao userDao, RoleService roleService, PasswordEncoder passwordEncoder) {
         this.userDao = userDao;
         this.roleService = roleService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional
     @Override
     public void add(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userDao.add(setRoles(user));
     }
 
@@ -39,8 +43,10 @@ public class UserServiceImp implements UserService {
         User userToBeUpdated = userDao.show(id);
         userToBeUpdated.setFirstName(user.getFirstName());
         userToBeUpdated.setLastName(user.getLastName());
-        userToBeUpdated.setPassword(user.getPassword());
         userToBeUpdated.setRoles(user.getRoles());
+        if (!userToBeUpdated.getPassword().equals(user.getPassword())) {
+            userToBeUpdated.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
         userDao.add(setRoles(userToBeUpdated));
     }
 

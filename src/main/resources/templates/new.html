@@ -5,7 +5,7 @@
     <title>New user</title>
 </head>
 <body>
-<form th:method="POST" th:action="@{/}" th:object="${user}">
+<form th:method="POST" th:action="@{/admin/}" th:object="${user}">
     <label for="firstName">First Name</label>
     <input id="firstName" th:field="*{firstName}" type="text"/>
     <label for="lastName">Last Name</label>

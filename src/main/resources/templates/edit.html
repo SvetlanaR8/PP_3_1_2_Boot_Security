@@ -5,7 +5,7 @@
     <title>Edit user</title>
 </head>
 <body>
-<form th:method="PATCH" th:action="@{/{id}(id=${user.getId()})}" th:object="${user}">
+<form th:method="PATCH" th:action="@{/admin/{id}(id=${user.getId()})}" th:object="${user}">
   <label for="firstName">First Name</label>
   <input id="firstName" th:field="*{firstName}" type="text"/>
   <label for="lastName">Last Name</label>

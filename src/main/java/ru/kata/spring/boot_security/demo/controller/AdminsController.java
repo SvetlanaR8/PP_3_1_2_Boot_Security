@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 @Controller
-
+@RequestMapping("/admin")
 public class AdminsController {
     private final UserService userService;
     private final RoleService roleService;
@@ -34,24 +34,24 @@ public class AdminsController {
         binder.registerCustomEditor(Role.class, new RolePropertyEditor());
     }
 
-    @GetMapping("/admin")
+    @GetMapping("")
     public String getUsers(ModelMap model) {
         model.addAttribute("users", userService.findAll());
         return "users";
     }
 
-    @GetMapping("/admin/{id}")
+    @GetMapping("/{id}")
     public String show(@PathVariable("id") Long id, Model model) {
         model.addAttribute("user", userService.show(id));
         return "show";
     }
 
-    @GetMapping("/admin/show")
+    @GetMapping("/show")
     public String show_by_id(@RequestParam("id") Long id, Model model) {
         model.addAttribute("user", userService.show(id));
         return "show";
     }
-    @GetMapping("/admin/new")
+    @GetMapping("/new")
     public String newUser(ModelMap model) {
         User user = new User();
         model.addAttribute("user", user);
@@ -60,13 +60,13 @@ public class AdminsController {
         return "new";
     }
 
-    @PostMapping()
+    @PostMapping("")
     public String add(@ModelAttribute("user") User user) {
         userService.add(user);
         return "redirect:/admin";
     }
 
-    @GetMapping("/admin/{id}/edit")
+    @GetMapping("/{id}/edit")
     public String edit(Model model, @PathVariable("id") Long id) {
         model.addAttribute("user", userService.show(id));
         List<Role> roles = roleService.findAll();
